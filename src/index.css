@@ -1,0 +1,85 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 240 6% 10%;
+    --foreground: 0 0% 100%;
+    --card: 240 6% 12%;
+    --card-foreground: 0 0% 100%;
+    --popover: 240 6% 12%;
+    --popover-foreground: 0 0% 100%;
+    --primary: 15 79% 61%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 33 94% 54%;
+    --secondary-foreground: 0 0% 100%;
+    --muted: 240 6% 16%;
+    --muted-foreground: 220 9% 69%;
+    --accent: 33 94% 54%;
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 240 6% 22%;
+    --input: 240 6% 16%;
+    --ring: 15 79% 61%;
+    --radius: 0.5rem;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans;
+
+    background: linear-gradient(135deg, hsl(var(--background)) 0%, hsl(15deg 15 25) 100%);
+    min-height: 100vh;
+  }
+}
+
+@layer components {
+  .neon-glow {
+    box-shadow: 0 0 20px hsl(var(--primary) / 30%), 0 0 40px hsl(var(--primary) / 20%);
+  }
+  
+  .neon-text {
+    text-shadow: 0 0 10px hsl(var(--primary) / 80%), 0 0 20px hsl(var(--primary) / 60%);
+  }
+  
+  .dice-shadow {
+    box-shadow: 
+      0 10px 30px rgb(0 0 0 / 50%),
+      0 0 20px hsl(var(--primary) / 30%);
+  }
+  
+  .win-glow {
+    animation: win-pulse 2s ease-in-out infinite;
+  }
+  
+  @keyframes win-pulse {
+    0%, 100% { 
+      box-shadow: 0 0 20px hsl(var(--secondary) / 50%);
+    }
+
+    50% { 
+      box-shadow: 0 0 40px hsl(var(--secondary) / 80%), 0 0 60px hsl(var(--secondary) / 60%);
+    }
+  }
+  
+  .dice-roll {
+    animation: dice-roll 2s ease-in-out;
+  }
+  
+  @keyframes dice-roll {
+    0% { transform: rotateX(0deg) rotateY(0deg); }
+    25% { transform: rotateX(180deg) rotateY(90deg); }
+    50% { transform: rotateX(360deg) rotateY(180deg); }
+    75% { transform: rotateX(540deg) rotateY(270deg); }
+    100% { transform: rotateX(720deg) rotateY(360deg); }
+  }
+}
