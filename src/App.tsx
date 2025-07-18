@@ -36,51 +36,75 @@ function App() {
     const unsubscribe = blink.auth.onAuthStateChanged((state) => {
       setUser(state.user)
       setLoading(state.isLoading)
-      
-      // Load user data when authenticated
-      if (state.user?.id) {
-        loadUserData()
-      }
     })
     return unsubscribe
-  }, [loadUserData])
+  }, [])
+
+  // Load user data when user changes
+  useEffect(() => {
+    if (!user?.id) return
+
+    const loadUserData = async () => {
+      try {
+        // Load or create user balance
+        const existingBalance = await blink.db.userBalances.list({
+          where: { user_id: user.id },
+          limit: 1
+        })
+
+        if (existingBalance.length === 0) {
+          // Create new user balance
+          await blink.db.userBalances.create({
+            user_id: user.id,
+            balance: 100.0,
+            total_winnings: 0.0,
+            total_bets: 0.0,
+            games_played: 0
+          })
+          setBalance({
+            userId: user.id,
+            balance: 100.0,
+            totalWinnings: 0.0,
+            totalBets: 0.0,
+            gamesPlayed: 0,
+            updatedAt: new Date().toISOString()
+          })
+        } else {
+          // Convert snake_case to camelCase for UI
+          const balanceData = existingBalance[0]
+          setBalance({
+            userId: balanceData.user_id,
+            balance: balanceData.balance,
+            totalWinnings: balanceData.total_winnings,
+            totalBets: balanceData.total_bets,
+            gamesPlayed: balanceData.games_played,
+            updatedAt: balanceData.updated_at
+          })
+        }
+
+        // Load game history
+        const userGames = await blink.db.games.list({
+          where: { user_id: user.id },
+          orderBy: { created_at: 'desc' },
+          limit: 20
+        })
+        setGames(userGames)
+      } catch (error) {
+        console.error('Error loading user data:', error)
+      }
+    }
+
+    loadUserData()
+  }, [user?.id])
 
   const loadUserData = useCallback(async () => {
     if (!user?.id) return
 
     try {
-      // Load or create user balance
-      const existingBalance = await blink.db.userBalances.list({
-        where: { userId: user.id },
-        limit: 1
-      })
-
-      if (existingBalance.length === 0) {
-        // Create new user balance
-        await blink.db.userBalances.create({
-          id: user.id,
-          userId: user.id,
-          balance: 100.0,
-          totalWinnings: 0.0,
-          totalBets: 0.0,
-          gamesPlayed: 0
-        })
-        setBalance({
-          userId: user.id,
-          balance: 100.0,
-          totalWinnings: 0.0,
-          totalBets: 0.0,
-          gamesPlayed: 0,
-          updatedAt: new Date().toISOString()
-        })
-      } else {
-        setBalance(existingBalance[0])
-      }
-
       // Load game history
       const userGames = await blink.db.games.list({
-        where: { userId: user.id },
-        orderBy: { createdAt: 'desc' },
+        where: { user_id: user.id },
+        orderBy: { created_at: 'desc' },
         limit: 20
       })
       setGames(userGames)
@@ -175,14 +199,14 @@ function App() {
       const gameId = `game_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
       await blink.db.games.create({
         id: gameId,
-        userId: user.id,
-        productUrl: product.url,
-        productName: product.name,
-        productPrice: product.price,
-        betAmount,
-        diceRoll: result,
+        user_id: user.id,
+        product_url: product.url,
+        product_name: product.name,
+        product_price: product.price,
+        bet_amount: betAmount,
+        dice_roll: result,
         won,
-        payoutAmount: payout
+        payout_amount: payout
       })
 
       // Update user balance
@@ -193,9 +217,9 @@ function App() {
 
       await blink.db.userBalances.update(user.id, {
         balance: newBalance,
-        totalWinnings: newTotalWinnings,
-        totalBets: newTotalBets,
-        gamesPlayed: newGamesPlayed
+        total_winnings: newTotalWinnings,
+        total_bets: newTotalBets,
+        games_played: newGamesPlayed
       })
 
       // Update local state

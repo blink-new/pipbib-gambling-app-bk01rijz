@@ -51,7 +51,7 @@ export function GameHistory({ games }: GameHistoryProps) {
                       <X className="h-4 w-4 text-red-400" />
                     )}
                     <span className="text-sm font-medium text-white">
-                      Roll: {game.diceRoll}
+                      Roll: {game.dice_roll}
                     </span>
                   </div>
                   
@@ -60,11 +60,11 @@ export function GameHistory({ games }: GameHistoryProps) {
                       variant={game.won ? "default" : "secondary"}
                       className={game.won ? "bg-yellow-500/20 text-yellow-400" : "bg-red-500/20 text-red-400"}
                     >
-                      ${game.betAmount.toFixed(2)}
+                      ${game.bet_amount.toFixed(2)}
                     </Badge>
                     {game.won && (
                       <Badge className="bg-green-500/20 text-green-400">
-                        Won ${game.payoutAmount?.toFixed(2)}
+                        Won ${game.payout_amount?.toFixed(2)}
                       </Badge>
                     )}
                   </div>
@@ -72,7 +72,7 @@ export function GameHistory({ games }: GameHistoryProps) {
                 
                 <div className="text-right">
                   <p className="text-xs text-gray-400">
-                    {new Date(game.createdAt).toLocaleDateString()}
+                    {new Date(game.created_at).toLocaleDateString()}
                   </p>
                 </div>
               </div>
